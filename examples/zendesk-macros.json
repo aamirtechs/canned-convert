@@ -1,0 +1,37 @@
+{
+  "macros": [
+    {
+      "id": 1,
+      "title": "Greeting and first reply",
+      "active": true,
+      "actions": [
+        {
+          "field": "comment_value",
+          "value": "Hi {{ticket.requester.first_name}}, thanks for writing in about \"{{ticket.subject}}\". My name is {{ticket.assignee.name}} from {{ticket.organization.name}} and I am looking into ticket {{ticket.id}} now."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Ask for more detail",
+      "active": true,
+      "actions": [
+        {
+          "field": "comment_value",
+          "value": "<p>Hello {{ticket.requester.name}},</p><p>Could you confirm the email on the account ({{ticket.requester.email}})? The custom reference is {{ticket.custom_field_123}}.</p>"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Closing note",
+      "active": true,
+      "actions": [
+        {
+          "field": "comment_value",
+          "value": "Thanks again, {{ticket.requester.first_name}}. This ticket was due on {{ticket.due_date}}. If you were happy with the help, the rating was {{satisfaction.rating}}."
+        }
+      ]
+    }
+  ]
+}

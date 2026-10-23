@@ -1,0 +1,14 @@
+{
+  "canned_responses": [
+    {
+      "id": 11,
+      "title": "Refund status",
+      "content": "Hi {{ticket.requester.firstname}}, your refund for ticket {{ticket.id}} is on its way. Any questions, reply to {{ticket.agent.email}}."
+    },
+    {
+      "id": 12,
+      "title": "Company welcome",
+      "content": "Welcome aboard, {{ticket.company.name}}. Your contact is {{ticket.requester.name}} ({{ticket.requester.email}})."
+    }
+  ]
+}

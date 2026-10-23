@@ -1,0 +1,106 @@
+{
+  "placeholders": [
+    {
+      "name": "requester_first_name",
+      "zendesk": "{{ticket.requester.first_name}}",
+      "freshdesk": "{{ticket.requester.firstname}}",
+      "note": "Freshdesk spells this field firstname, with no underscore."
+    },
+    {
+      "name": "requester_name",
+      "zendesk": "{{ticket.requester.name}}",
+      "freshdesk": "{{ticket.requester.name}}",
+      "note": ""
+    },
+    {
+      "name": "requester_email",
+      "zendesk": "{{ticket.requester.email}}",
+      "freshdesk": "{{ticket.requester.email}}",
+      "note": ""
+    },
+    {
+      "name": "requester_phone",
+      "zendesk": "{{ticket.requester.phone}}",
+      "freshdesk": "{{ticket.requester.phone}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_id",
+      "zendesk": "{{ticket.id}}",
+      "freshdesk": "{{ticket.id}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_subject",
+      "zendesk": "{{ticket.subject}}",
+      "freshdesk": "{{ticket.subject}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_description",
+      "zendesk": "{{ticket.description}}",
+      "freshdesk": "{{ticket.description}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_status",
+      "zendesk": "{{ticket.status}}",
+      "freshdesk": "{{ticket.status}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_priority",
+      "zendesk": "{{ticket.priority}}",
+      "freshdesk": "{{ticket.priority}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_type",
+      "zendesk": "{{ticket.type}}",
+      "freshdesk": "{{ticket.type}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_url",
+      "zendesk": "{{ticket.url}}",
+      "freshdesk": "{{ticket.url}}",
+      "note": ""
+    },
+    {
+      "name": "ticket_created_at",
+      "zendesk": "{{ticket.created_at}}",
+      "freshdesk": "{{ticket.created_at}}",
+      "note": ""
+    },
+    {
+      "name": "agent_name",
+      "zendesk": "{{ticket.assignee.name}}",
+      "freshdesk": "{{ticket.agent.name}}",
+      "note": "Zendesk calls the assigned person the assignee, Freshdesk calls them the agent."
+    },
+    {
+      "name": "agent_email",
+      "zendesk": "{{ticket.assignee.email}}",
+      "freshdesk": "{{ticket.agent.email}}",
+      "note": ""
+    },
+    {
+      "name": "organization_name",
+      "zendesk": "{{ticket.organization.name}}",
+      "freshdesk": "{{ticket.company.name}}",
+      "note": "Freshdesk calls an organization a company."
+    },
+    {
+      "name": "ticket_due_date",
+      "zendesk": "{{ticket.due_date}}",
+      "freshdesk": null,
+      "note": "No Freshdesk canned response equivalent in this mapping. Left as-is and reported."
+    },
+    {
+      "name": "satisfaction_rating",
+      "zendesk": "{{satisfaction.rating}}",
+      "freshdesk": null,
+      "note": "No Freshdesk canned response equivalent in this mapping. Left as-is and reported."
+    }
+  ]
+}

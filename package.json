@@ -1,0 +1,23 @@
+{
+  "name": "canned-convert",
+  "version": "1.0.0",
+  "description": "Convert macros and canned responses between Zendesk, Freshdesk, Intercom and Chatwoot formats offline, placeholders translated with an editable mapping file, plus a report of any placeholder that could not be mapped.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "canned-convert": "src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test tests/convert.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "zendesk",
+    "freshdesk",
+    "canned-responses",
+    "macros",
+    "converter"
+  ]
+}
