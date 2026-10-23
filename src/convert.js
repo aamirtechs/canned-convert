@@ -1,10 +1,14 @@
 import { readFileSync } from "node:fs";
 
-export function loadMapping(path) {
-  const raw = JSON.parse(readFileSync(path, "utf8"));
+export function parseMapping(text) {
+  const raw = JSON.parse(text);
   const rows = Array.isArray(raw) ? raw : raw.placeholders;
   if (!Array.isArray(rows)) throw new Error("Mapping file must be an array or an object with a placeholders array");
   return rows;
+}
+
+export function loadMapping(path) {
+  return parseMapping(readFileSync(path, "utf8"));
 }
 
 export function buildDirectionMap(rows, direction) {

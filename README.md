@@ -1,5 +1,6 @@
 # canned-convert
 Live page: https://aamirtechs.github.io/canned-convert/
+Use it in your browser: the Pages site above runs the full tool locally, no install needed.
 
 Convert macros and canned responses between Zendesk, Freshdesk, Intercom and Chatwoot formats offline, with placeholders translated through an editable mapping file and a report of anything that could not be mapped.
 

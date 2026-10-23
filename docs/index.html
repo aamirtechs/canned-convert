@@ -77,6 +77,26 @@ footer .links a{margin:0 10px}
   .grid{grid-template-columns:1fr}
 }
 </style>
+
+<style>
+.tool label{display:block;font-weight:600;margin:14px 0 6px;color:var(--navy)}
+.tool input[type=file]{width:100%;padding:12px;border:1.5px dashed #b9c6d4;border-radius:9px;background:#fbfcfe;font:inherit}
+.tool textarea{width:100%;min-height:110px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-family:Consolas,'Liberation Mono',monospace;font-size:13.5px;background:#fff}
+.tool select{padding:9px 12px;border:1px solid var(--line);border-radius:9px;font:inherit;background:#fff}
+.tool .row{display:flex;gap:14px;flex-wrap:wrap}
+.tool .row>div{flex:1;min-width:200px}
+button.go{background:var(--gold);color:#171106;border:0;font:inherit;font-weight:700;padding:12px 26px;border-radius:9px;cursor:pointer;margin-top:16px}
+button.go:hover{background:var(--gold2)}
+button.dl{background:var(--navy);color:#fff;border:0;font:inherit;font-weight:600;padding:10px 18px;border-radius:9px;cursor:pointer;margin:10px 8px 0 0}
+#status{margin-top:14px;font-weight:600}
+#status.error{color:#b3261e}
+pre.out{max-height:420px;overflow:auto;white-space:pre-wrap;word-break:break-word}
+.dragover{outline:3px solid var(--gold);outline-offset:4px}
+.hidden{display:none}
+.check{display:flex;gap:8px;align-items:center;font-weight:600;margin-top:14px}
+.check input{width:18px;height:18px}
+ul.counts{margin:10px 0 0 18px}
+</style>
 </head>
 <body>
 <header class="hero">
@@ -86,28 +106,127 @@ footer .links a{margin:0 10px}
   <a class="btn" href="https://github.com/aamirtechs/canned-convert">View source on GitHub</a>
 </header>
 <main class="wrap">
-  <section>
-    <h2>What it does</h2>
-    <div class="grid">
-      <div class="card">Zendesk macros to Freshdesk canned responses, in JSON or CSV, and Freshdesk canned responses back to Zendesk macros</div>
-      <div class="card">Placeholder translation through an editable placeholders.json mapping file covering 17 shared concepts</div>
-      <div class="card">A conversion report lists every unmapped placeholder with a reason, so a human can finish the job with a complete list</div>
-      <div class="card">Placeholders with no equivalent in the target platform are left as-is and documented, never silently dropped</div>
-      <div class="card">Optional plain text mode strips HTML tags from bodies while converting</div>
+
+<section class="tool" id="tool">
+  <h2>Use it in your browser</h2>
+  <p class="note">Runs fully in your browser, files never leave your device. Drop a macros or canned responses JSON export below, or paste its contents. Placeholders are translated with the shipped placeholders.json mapping, bundled into this page. Version 1 converts Zendesk to Freshdesk and Freshdesk to Zendesk, matching the CLI. Intercom and Chatwoot are seeded as good first issues in the repo and are not converted yet.</p>
+  <label for="file">Export file (.json)</label>
+  <input type="file" id="file" accept=".json">
+  <p class="note" id="dropName">You can also drag and drop the file anywhere on this panel.</p>
+  <label for="paste">Or paste export JSON</label>
+  <textarea id="paste" placeholder="Paste a Zendesk macros export or a Freshdesk canned responses export"></textarea>
+  <div class="row">
+    <div>
+      <label for="from">From platform</label>
+      <select id="from"><option value="zendesk" selected>Zendesk</option><option value="freshdesk">Freshdesk</option><option value="intercom" disabled>Intercom (not in v1)</option><option value="chatwoot" disabled>Chatwoot (not in v1)</option></select>
     </div>
-  </section>
-  <section>
-    <h2>Install and usage</h2>
-    <p class="note">Requires Node.js 20 or later. There are no dependencies to install.</p>
-    <pre><code>git clone https://github.com/aamirtechs/canned-convert.git
-cd canned-convert
-node src/cli.js --input examples/zendesk-macros.json --from zendesk --to freshdesk --output freshdesk.json --report report.md</code></pre>
-    <p class="note">Add --format csv for CSV output, reverse the direction with --from freshdesk --to zendesk, or pass --mapping your-file.json to use your own copy of the mapping table.</p>
-  </section>
+    <div>
+      <label for="to">To platform</label>
+      <select id="to"><option value="freshdesk" selected>Freshdesk</option><option value="zendesk">Zendesk</option><option value="intercom" disabled>Intercom (not in v1)</option><option value="chatwoot" disabled>Chatwoot (not in v1)</option></select>
+    </div>
+    <div>
+      <label for="format">Output format</label>
+      <select id="format"><option value="json" selected>JSON</option><option value="csv">CSV (Zendesk to Freshdesk only)</option></select>
+    </div>
+  </div>
+  <label for="mapfile">Custom mapping file (optional, placeholders.json format)</label>
+  <input type="file" id="mapfile" accept=".json">
+  <label class="check"><input type="checkbox" id="plain"> Plain text: strip HTML tags from bodies (--plain-text)</label>
+  <button class="go" id="run">Convert</button>
+  <div id="status" role="status"></div>
+  <div id="downloads"></div>
+</section>
+<section id="reportWrap" class="hidden">
+  <h2>Conversion report (report.md)</h2>
+  <pre class="out" id="report"></pre>
+  <h2 style="margin-top:22px">Converted output preview</h2>
+  <pre class="out" id="preview"></pre>
+</section>
+
 </main>
 <footer>
   <p>Built by Amir Hussain, operations manager and founder of AamirTechs.</p>
   <p class="links"><a href="https://aamirtechs.com">AamirTechs: operations, customer support and e-commerce services</a> <a href="https://github.com/aamirtechs">More open source tools</a></p>
 </footer>
+<script src="app.js"></script>
+<script>
+(function () {
+
+function download(name, text, type) {
+  var blob = new Blob([text], { type: type || 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+}
+function makeDl(label, name, text, type) {
+  var b = document.createElement('button'); b.className = 'dl'; b.textContent = label;
+  b.addEventListener('click', function () { download(name, text, type); });
+  return b;
+}
+function wireDrop(zone, input, store) {
+  zone.addEventListener('dragover', function (e) { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', function () { zone.classList.remove('dragover'); });
+  zone.addEventListener('drop', function (e) {
+    e.preventDefault(); zone.classList.remove('dragover');
+    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (!f) return;
+    store.file = f;
+    try { var dt = new DataTransfer(); dt.items.add(f); input.files = dt.files; } catch (err) {}
+    var note = document.getElementById('dropName');
+    if (note) note.textContent = 'Loaded file: ' + f.name;
+  });
+}
+async function readInput(store, input, textarea) {
+  var f = store.file || (input.files && input.files[0]);
+  if (f) return { text: await f.text(), name: f.name };
+  return { text: textarea.value, name: '' };
+}
+
+var store = {};
+wireDrop(document.getElementById('tool'), document.getElementById('file'), store);
+document.getElementById('run').addEventListener('click', async function () {
+  var status = document.getElementById('status');
+  var downloads = document.getElementById('downloads');
+  var reportWrap = document.getElementById('reportWrap');
+  status.className = ''; status.textContent = ''; downloads.innerHTML = ''; reportWrap.classList.add('hidden');
+  try {
+    var input = await readInput(store, document.getElementById('file'), document.getElementById('paste'));
+    if (!input.text.trim()) { status.className = 'error'; status.textContent = 'Choose an export file or paste its contents first.'; return; }
+    var api = window.CannedConvert;
+    var mapFile = document.getElementById('mapfile').files && document.getElementById('mapfile').files[0];
+    var rows = mapFile ? api.parseMapping(await mapFile.text()) : api.MAPPING_ROWS;
+    var from = document.getElementById('from').value;
+    var to = document.getElementById('to').value;
+    var direction = from + '-to-' + to;
+    if (direction !== 'zendesk-to-freshdesk' && direction !== 'freshdesk-to-zendesk') {
+      status.className = 'error';
+      status.textContent = 'Unsupported direction: ' + direction + '. Supported: zendesk-to-freshdesk, freshdesk-to-zendesk';
+      return;
+    }
+    var format = document.getElementById('format').value;
+    if (format === 'csv' && direction !== 'zendesk-to-freshdesk') {
+      status.className = 'error';
+      status.textContent = 'CSV output is only supported for zendesk-to-freshdesk';
+      return;
+    }
+    var data = JSON.parse(input.text);
+    var opts = { plainText: document.getElementById('plain').checked };
+    var result = direction === 'zendesk-to-freshdesk' ? api.zendeskToFreshdesk(data, rows, opts) : api.freshdeskToZendesk(data, rows, opts);
+    var outText, outName;
+    if (format === 'csv') { outText = api.toCsv(result.output.canned_responses); outName = to + '.csv'; }
+    else { outText = JSON.stringify(result.output, null, 2) + '\n'; outName = to + '.json'; }
+    var report = api.buildReport({ direction: direction, converted: result.converted, unmapped: result.unmapped });
+    status.textContent = 'Converted ' + result.converted + ' item(s) to ' + outName + '. Unmapped placeholders: ' + result.unmapped.length + '.';
+    downloads.appendChild(makeDl('Download ' + outName, outName, outText, format === 'csv' ? 'text/csv;charset=utf-8' : 'application/json;charset=utf-8'));
+    downloads.appendChild(makeDl('Download report.md', 'report.md', report, 'text/markdown;charset=utf-8'));
+    document.getElementById('report').textContent = report;
+    document.getElementById('preview').textContent = outText;
+    reportWrap.classList.remove('hidden');
+  } catch (e) { status.className = 'error'; status.textContent = e.message; }
+});
+
+})();
+</script>
 </body>
 </html>
